@@ -1,0 +1,39 @@
+﻿@{
+    ViewBag.Title = "Manage Task";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div id="modal-container" class="modal fade" data-backdrop="static"
+     tabindex="-1" role="dialog">
+    <div class="modal-content">
+    </div>
+</div>
+<div class="container-fluid" style="margin-top:90px" id="costDetail">
+    <div class="row">
+        <div class="col-md-12 col-xs-12 col-sm-12" style="padding:0px">
+            <div class="form-group inline-group-margin col-md-12 col-xs-12 col-sm-12" style="padding: 0px;">
+                <div class="col-md-6 col-xs-6 sm-6">
+
+                </div>
+                <div class="col-md-6 col-xs-6 sm-6" align="right">
+                    <button type="submit" class=" btn btn-sm btn-primary btn-addon" title="Add" data-bind="click:addCost">Add</button>
+                    <button type="submit" class=" btn btn-sm btn-primary btn-addon" title="Edit" data-bind="click:addCost">Edit</button>
+                    <button type="submit" class=" btn btn-sm btn-primary btn-addon" title="Delete" data-bind="click:delCost">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div id="costGrid" data-bind="source:costDs ,events: { change: change}">
+
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    .modal-content {
+        width: 60% !important;
+        margin: 30px auto !important;
+    }
+</style>
+<script src="~/Scripts/js/Costing.js"></script>
