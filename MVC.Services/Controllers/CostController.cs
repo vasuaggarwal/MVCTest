@@ -1,5 +1,7 @@
 ﻿using Kendo.Mvc.UI;
 using MVC.Data;
+using MVC.Data.Infrastructure;
+using MVC.Data.Repositories;
 using MVC.Model;
 using System;
 using System.Collections.Generic;
@@ -15,11 +17,19 @@ namespace MVC.Services.Controllers
     public class CostController : ApiController
     {
         AppDataContext db = new AppDataContext();
+        private ICostRepository costRepository;
+        private IUnitOfWork unitOfWork;
+        public CostController(ICostRepository costRepository, IUnitOfWork unitOfWork)
+        {
+            this.costRepository = costRepository;
+            this.unitOfWork = unitOfWork;
+           
+        }
         [Route("api/Cost/GetGridData")]
        [HttpGet]        
         public IHttpActionResult GetGridData([ModelBinder(typeof(MVC.Services.Extensions.DataSourceRequestModelBinder))]DataSourceRequest request)
         {
-            var data = db.Costs.ToList();
+            var data = costRepository.GetAll().ToList();
             return Ok(data);
         }
         [Route("api/Cost/Save")]
@@ -32,20 +42,21 @@ namespace MVC.Services.Controllers
             }
             if (cost.Id == 0)
             {
-                db.Costs.Add(cost);
+                costRepository.Add(cost);  
             }
             else
             {
-                var task = db.Costs.Where(c => c.Id == cost.Id).FirstOrDefault();
+                var task = costRepository.GetById(cost.Id);
                 if (task != null)
                 {
                     task.Name = cost.Name;
                     task.Priority = cost.Priority;
                     task.Description = cost.Description;
                     task.EstimatedCost = cost.EstimatedCost;
+                    costRepository.Update(task);
                 }
             }
-            db.SaveChanges();
+            unitOfWork.Commit();
             return Ok(cost);
         }
       [Route("api/Cost/Delete/{Id}")]
@@ -54,11 +65,11 @@ namespace MVC.Services.Controllers
         {
             if(Id==0)
                 return BadRequest("Cant Delete data");
-            var cost=db.Costs.Where(c=>c.Id==Id).FirstOrDefault();
+            var cost = costRepository.GetById(Id);
             if(cost==null)
                 return BadRequest("Cant Delete data");
-            db.Costs.Remove(cost);
-            db.SaveChanges();
+            costRepository.Delete(cost);
+            unitOfWork.Commit();
             return Ok("Data deleted successfully");
         }
       [Route("api/Cost/GetCost/{Id}")]
